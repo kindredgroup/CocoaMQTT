@@ -237,12 +237,17 @@ public class CocoaMQTT5: NSObject, CocoaMQTT5Client {
     
 
     /// Console log level
+    private let loggerQueue = DispatchQueue(label: "CocoaMQTTLogger.queue", attributes: .concurrent)
     public var logLevel: CocoaMQTTLoggerLevel {
         get {
-            return CocoaMQTTLogger.logger.minLevel
+            loggerQueue.sync {
+                CocoaMQTTLogger.logger.minLevel
+            }
         }
         set {
-            CocoaMQTTLogger.logger.minLevel = newValue
+            loggerQueue.async(flags: .barrier) {
+                CocoaMQTTLogger.logger.minLevel = newValue
+            }
         }
     }
 
