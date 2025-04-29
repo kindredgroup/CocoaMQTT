@@ -172,7 +172,8 @@ public class CocoaMQTT5: NSObject, CocoaMQTT5Client {
     /// The delegate/closure callback function will be committed asynchronously to it
     public var delegateQueue = DispatchQueue.main
 
-    public var connState = CocoaMQTTConnState.disconnected {
+    @ConcurrentAtomic(wrappedValue: CocoaMQTTConnState.disconnected, label: "CocoaMQTT5.connState")
+    public var connState {
         didSet {
             __delegate_queue {
                 self.delegate?.mqtt5?(self, didStateChangeTo: self.connState)
@@ -234,7 +235,6 @@ public class CocoaMQTT5: NSObject, CocoaMQTT5Client {
 
     private var autoReconnTimer: CocoaMQTTTimer?
     private var is_internal_disconnected = false
-    
 
     /// Console log level
     public var logLevel: CocoaMQTTLoggerLevel {
